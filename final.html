@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gaarrkh / Shivshakti Portal — Updated</title>
+<style>
+:root{
+  --bg1:#071232; --bg2:#0a1b45; --gold:#d4af37; --glass:rgba(255,255,255,0.04);
+  --card: rgba(255,255,255,0.05);
+  font-family: Inter, Poppins, system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff;-webkit-font-smoothing:antialiased;}
+.container{max-width:1100px;margin:24px auto;padding:18px;}
+.card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,0.5);border:1px solid rgba(212,175,55,0.06)}
+.center{display:flex;align-items:center;justify-content:center;flex-direction:column}
+h1{margin:6px 0 12px;font-weight:600;color:var(--gold);letter-spacing:0.6px;text-align:center}
+.logo{width:140px;height:140px;border-radius:18px;background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(255,255,255,0.03));display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--gold);font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,0.5);margin-bottom:8px}
+
+/* layout */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.left-pane{width:240px;min-height:86vh;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;position:fixed;left:24px;top:24px}
+.main-pane{margin-left:280px;padding-top:12px}
+
+/* form */
+input,select,textarea{background:transparent;border:1px solid rgba(255,255,255,0.09);padding:10px;border-radius:8px;color:#fff;min-height:38px;width:100%}
+label{display:block;font-size:13px;color:#cfd6ff;margin-bottom:6px}
+.btn{background:linear-gradient(90deg,var(--gold),#f3d27a);color:#011; padding:10px 14px;border-radius:10px;border:none;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.45);}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid rgba(212,175,55,0.12)}
+.small{font-size:13px;color:#d6d9ff}
+.card-light{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:10px;border-radius:10px}
+.preview{width:110px;height:110px;border-radius:8px;object-fit:cover;border:2px solid rgba(212,175,55,0.12)}
+
+/* tabs */
+.navitem{padding:8px;margin-bottom:8px;border-radius:8px;color:#fff;display:flex;align-items:center;gap:8px;cursor:pointer}
+.navitem:hover{background:rgba(255,255,255,0.02)}
+
+/* select style accent */
+select { background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); padding-right: 32px; position: relative; }
+select::-ms-expand { display: none; }
+
+/* calendar */
+.calendar-table{width:100%;border-collapse:collapse;}
+.calendar-table th,.calendar-table td{border:1px solid rgba(255,255,255,0.03);padding:8px;text-align:left;vertical-align:top;height:80px}
+.event{background:rgba(212,175,55,0.12);padding:4px;border-radius:6px;margin-bottom:4px;font-size:13px;color:var(--gold)}
+.badge{background:#0b2a5a;padding:6px 10px;border-radius:8px;color:var(--gold);font-weight:600}
+.footer{margin-top:18px;text-align:center;color:#d6d6e8;font-size:13px}
+.link{color:var(--gold);text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Welcome -->
+  <div id="page-welcome" class="card center">
+    <div class="logo" id="mainLogo">G / S</div>
+    <h1 id="welcomeText">Welcome to Gaarrkh / Shivshakti Portal</h1>
+    <div class="small" style="margin-bottom:12px">Select organisation and register to continue</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn" onclick="go('register')">Register</button>
+      <button class="btn ghost" onclick="go('login')">Login</button>
+    </div>
+  </div>
+
+  <!-- Registration -->
+  <div id="page-register" class="card" style="display:none">
+    <h2 style="color:var(--gold)">1. Registration</h2>
+    <div class="grid2">
+      <div>
+        <label>Select Organisation</label>
+        <select id="orgSelect" onchange="updateWelcomePreview(); updateRegCategoryFromOrg()">
+          <option value="gaarrkh">Gaarrkh</option>
+          <option value="shivshakti">Shivshakti</option>
+        </select>
+      </div>
+      <div>
+        <label>Already Registered?</label>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="go('login')">Login Here</button>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.04);margin:12px 0">
+
+    <h3 style="color:var(--gold)">Personal & Contact details</h3>
+    <div class="grid2">
+      <div>
+        <label>Full name</label><input id="reg_name" placeholder="Full name">
+      </div>
+      <div>
+        <label>Email / username</label><input id="reg_username" placeholder="Email or username">
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:8px">
+      <div><label>Contact number</label><input id="reg_contact" placeholder="Primary contact"></div>
+      <div><label>Alternate number</label><input id="reg_alt_contact" placeholder="Alternate contact"></div>
+    </div>
+
+    <div class="grid2" style="margin-top:8px">
+      <div><label>State</label><input id="reg_state" placeholder="State"></div>
+      <div><label>City</label><input id="reg_city" placeholder="City"></div>
+    </div>
+
+    <div class="grid2" style="margin-top:8px">
+      <div><label>Service area - City</label><input id="reg_service_city" placeholder="Service area - city"></div>
+      <div><label>Service area - Zipcode</label><input id="reg_service_zip" placeholder="Zip code"></div>
+    </div>
+
+    <div class="grid2" style="margin-top:8px">
+      <div><label>Aadhaar number</label><input id="reg_adhar" placeholder="Aadhaar number"></div>
+      <div><label>PAN number</label><input id="reg_pan" placeholder="PAN number"></div>
+    </div>
+
+    <div class="grid2" style="margin-top:8px">
+      <div><label>Create password</label><input id="reg_password" type="password"></div>
+      <div><label>Upload ID (optional)</label><input id="reg_idfile" type="file" accept=".jpg,.png,.pdf"></div>
+    </div>
+
+    <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.04);margin:12px 0">
+
+    <!-- NEW: Category / Subcategory / Staff Level -->
+    <h3 style="color:var(--gold)">Category / Subcategory / Role</h3>
+    <div class="grid2">
+      <div>
+        <label>Category</label>
+        <select id="reg_category" onchange="updateRegSubcats()" class="styled-select">
+          <!-- injected -->
+        </select>
+      </div>
+      <div>
+        <label>Subcategory</label>
+        <select id="reg_subcategory" onchange="updateRegStaffLevels()" class="styled-select">
+          <!-- injected -->
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <label>Role (optional)</label>
+      <select id="reg_stafflevel" class="styled-select">
+        <option value="">-- select role --</option>
+      </select>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Terms & link</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a id="termsLink" class="small link" href="#" target="_blank">Terms & Conditions</a>
+        <label style="margin-left:12px"><input id="agreeTnc" type="checkbox"> I agree</label>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn ghost" onclick="go('welcome')">Back</button>
+      <button class="btn" onclick="registerUser()">Register →</button>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div id="page-login" class="card" style="display:none">
+    <h2 style="color:var(--gold)">Login</h2>
+    <div class="grid2">
+      <div><label>Username / Email</label><input id="login_username"></div>
+      <div><label>Password</label><input id="login_password" type="password"></div>
+    </div>
+    <div style="margin-top:8px">
+      <label>Role</label>
+      <select id="login_role" onchange="loginRoleChange()">
+        <option value="normal">Normal</option>
+        <option value="groupLeader">Group Leader</option>
+        <option value="miniCluster">Mini Cluster</option>
+        <option value="cluster">Cluster</option>
+        <option value="central">Central</option>
+        <option value="worker">Worker</option>
+      </select>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn ghost" onclick="go('register')">Back</button>
+      <button class="btn" onclick="doLogin()">Login →</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="page-dashboard" style="display:none">
+    <div class="left-pane card">
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div id="dashLogoMini" style="width:54px;height:54px;border-radius:8px;background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(255,255,255,0.02));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold)">G/S</div>
+          <div>
+            <div id="dashWelcome" style="font-weight:700;color:var(--gold)">Welcome</div>
+            <div id="dashRole" class="small"></div>
+          </div>
+        </div>
+
+        <div id="navList" style="margin-top:12px;width:100%">
+          <div class="navitem" onclick="showTab('home')">Home</div>
+          <div class="navitem" onclick="showTab('staff')">Staff</div>
+          <div class="navitem" onclick="showTab('tasks')">Tasks</div>
+          <div class="navitem" onclick="showTab('mytasks')">My Tasks</div>
+          <div class="navitem" onclick="showTab('calendar')">Calendar</div>
+          <div class="navitem" onclick="showTab('leave')">Leave / Report</div>
+          <div class="navitem" onclick="showTab('election')">Election / Vote</div>
+          <div class="navitem" onclick="showTab('settings')">Settings (colors)</div>
+          <div style="margin-top:12px"><button class="btn" onclick="logout()">Logout</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-pane">
+      <div class="card" style="margin-bottom:12px;display:flex;gap:18px;align-items:center">
+        <div>
+          <img id="profilePreview" class="preview" src="" alt="profile">
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div id="userName" style="font-weight:700;font-size:18px"></div>
+              <div id="userId" class="small"></div>
+              <!-- NEW: show category/subcategory/stafflevel -->
+              <div id="userCategory" class="small" style="margin-top:6px"></div>
+              <div id="userSubcategory" class="small"></div>
+              <div id="userStaffLevel" class="small"></div>
+            </div>
+            <div>
+              <label class="badge">Role: <span id="userRoleBadge"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tabContent" class="card">
+        <!-- Home -->
+        <div id="home" class="tab">
+          <h3>Home — Post text / video</h3>
+          <div class="small">Write a post (text) and/or upload a short video. Posts appear for all staff in same organisation.</div>
+          <div style="margin-top:8px">
+            <label>Text</label><textarea id="post_text" placeholder="Write something..."></textarea>
+            <label style="margin-top:8px">Upload video (mp4, max demo)</label>
+            <input type="file" id="post_video" accept="video/*">
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="clearPost()">Clear</button>
+              <button class="btn" onclick="submitPost()">Post</button>
+            </div>
+          </div>
+          <div id="posts_feed" style="margin-top:12px"></div>
+        </div>
+
+        <!-- Staff -->
+        <div id="staff" class="tab" style="display:none">
+          <h3>Staff</h3>
+          <div class="small">Select main & sub category to view full lower staff list (hierarchy).</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Filter main category</label>
+              <select id="staff_main" onchange="populateStaffDropdown()"></select>
+            </div>
+            <div style="flex:1">
+              <label>Filter sub category</label>
+              <select id="staff_sub" onchange="populateStaffDropdown()"></select>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label>Staff list (hierarchy)</label>
+            <select id="staff_list_dropdown" size="8" style="width:100%"></select>
+            <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn ghost" onclick="copyStaff()">Copy selected</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks -->
+        <div id="tasks" class="tab" style="display:none">
+          <h3>Create Task</h3>
+          <div class="small">Assign task to staff (shows down to worker).</div>
+          <div class="grid2" style="margin-top:8px">
+            <div>
+              <label>Task Title</label><input id="task_title">
+            </div>
+            <div>
+              <label>Priority</label>
+              <select id="task_priority"><option>High</option><option>Medium</option><option>Low</option></select>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <label>Task Description</label><textarea id="task_description"></textarea>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Assign: Select Main Category</label>
+              <select id="task_assign_main" onchange="populateAssignTo()"></select>
+            </div>
+            <div style="flex:1">
+              <label>Select Sub Category</label>
+              <select id="task_assign_sub" onchange="populateAssignTo()"></select>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Assign to (staff)</label>
+            <select id="task_assign_to"></select>
+          </div>
+
+          <div class="grid2" style="margin-top:8px">
+            <div><label>Deadline</label><input id="task_deadline" type="date"></div>
+            <div><label>Attach file</label><input id="task_file" type="file"></div>
+          </div>
+
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+            <button class="btn ghost" onclick="clearTaskForm()">Clear</button>
+            <button class="btn" onclick="createTask()">Create Task</button>
+          </div>
+
+        </div>
+
+        <!-- My tasks -->
+        <div id="mytasks" class="tab" style="display:none">
+          <h3>My Tasks</h3>
+          <div id="mytasks_list" style="margin-top:8px"></div>
+        </div>
+
+        <!-- Calendar -->
+        <div id="calendar" class="tab" style="display:none">
+          <h3>Calendar</h3>
+          <div class="small">Monthly calendar with events. Events added here show for all users (demo).</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Event title</label><input id="event_title">
+            </div>
+            <div style="flex:1">
+              <label>Event date</label><input id="event_date" type="date">
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn ghost" onclick="clearEvent()">Clear</button>
+            <button class="btn" onclick="createEvent()">Create Event</button>
+          </div>
+          <div id="calendar_view" style="margin-top:12px"></div>
+        </div>
+
+        <!-- Leave / Report -->
+        <div id="leave" class="tab" style="display:none">
+          <h3>Leave / Report an issue</h3>
+          <div class="small">Requests will notify higher-level users (demo).</div>
+          <div class="grid2" style="margin-top:8px">
+            <div><label>Type</label><select id="leave_type"><option>Leave</option><option>Report Issue</option></select></div>
+            <div><label>From date</label><input id="leave_from" type="date"></div>
+          </div>
+          <div style="margin-top:8px">
+            <label>Details</label><textarea id="leave_details"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button class="btn" onclick="submitLeave()">Submit</button>
+          </div>
+        </div>
+
+        <!-- Election -->
+        <div id="election" class="tab" style="display:none">
+          <h3>Election / Voting</h3>
+          <div class="small">Only Adhyaksh, Sachiv, Khajindar can stand — others can vote.</div>
+          <div style="margin-top:8px">
+            <label>Standee (only these three registered will appear)</label>
+            <select id="election_candidates"></select>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn" onclick="castVote()">Vote</button>
+            </div>
+            <div id="election_status" class="small" style="margin-top:8px"></div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div id="settings" class="tab" style="display:none">
+          <h3>Theme Settings</h3>
+          <div class="small">Change background / text color for election panel and header preview.</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Header background color (hex)</label>
+              <input id="setting_hdr_bg" placeholder="#071232">
+            </div>
+            <div style="flex:1">
+              <label>Header text color (hex)</label>
+              <input id="setting_hdr_text" placeholder="#d4af37">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button class="btn" onclick="applySettings()">Apply</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Updated portal — features: staff hierarchy, tasks (create/my tasks), calendar, leave/report, election color settings (demo localStorage)</div>
+</div>
+
+<script>
+// ---------------------- MAIN CATEGORIES WITH DETAILED SUBCATEGORIES ----------------------
+const mainCats = [
+  { key:'gaarrkh_central', label:'Gaarrkh — CENTRAL', subs:[
+    'Chairman','Vice Chairman','Managing Director','Executive Director','Operations and CEO','COO','CFO','CHRO','СТО','СМО',
+    'IT and Security Head','Legal Advisor/Company Secretary','Reception Manager','Office Administrator','Shift Supervisor',
+    'Digital Reply Operator','Office Boy/Girl','Membership and Franchise Development Head','Grievance Redressal Officer'
+  ]},
+  { key:'gaarrkh_state', label:'Gaarrkh — STATE', subs:[
+    'State Administrative Officer','State Projector Coordinator','Office Boy','State Operations & Monitoring Officer','State Training & Capacity Building Officer'
+  ]},
+  { key:'gaarrkh_divisional', label:'Gaarrkh — DIVISIONAL', subs:[
+    'Divisional Administrative Officer','Accountant','Detective','Office Boy','Auditor'
+  ]},
+  { key:'gaarrkh_zone', label:'Gaarrkh — ZONE', subs:[
+    'Zone Administrative Officer','Branch Coordinator + Marketing Head','Accounting + CSR Assistant','Zone IT Officer','Service Tracking Coordinator','Office Boy'
+  ]},
+  { key:'gaarrkh_cluster', label:'Gaarrkh — CLUSTER', subs:[
+    'Cluster Administrative Officer','Lawyer','Finance and Operations Controller','Marketing Officer','Office Boy'
+  ]},
+  { key:'gaarrkh_miniCluster', label:'Gaarrkh — MINI CLUSTER', subs:[
+    'Mini Cluster Head','HR Officer','Accountant','Office Boy'
+  ]},
+  { key:'gaarrkh_groupLeader', label:'Gaarrkh — GROUP LEADER', subs:[
+    'Group Leader','Group Leader Assistant'
+  ]},
+  { key:'gaarrkh_worker', label:'Gaarrkh — WORKER', subs:[
+    'Worker'
+  ]},
+
+  { key:'shivshakti_central', label:'Shivshakti — CENTRAL', subs:[
+    'Central President','Vice President','General Secretary','Organising Minister','Head of Media and Communication','Head of Culture and Events',
+    'Head of Training and Skill Development','Treasurer/Head of Finance','Head of Justice and Grievance Redressal','Head of Research and Policy Planning'
+  ]},
+  { key:'shivshakti_state', label:'Shivshakti — STATE', subs:[
+    'Head of State Liaison and Awareness','State Security Coordinator','State Justice Officer','State Planning and Development Coordinator','Receptionist','State Leadership Representative'
+  ]},
+  { key:'shivshakti_divisional', label:'Shivshakti — DIVISIONAL', subs:[
+    'Divisional Public Relations Officer','Divisional Justice Officer','Divisional Security Coordinator','Divisional Operations Manager','Receptionist'
+  ]},
+  { key:'shivshakti_zone', label:'Shivshakti — ZONE', subs:[
+    'Zone Leadership Representative','Zone Justice Chief','Zone Security Coordinator','Women\'s Planning Coordinator','Receptionist'
+  ]},
+  { key:'shivshakti_cluster', label:'Shivshakti — CLUSTER', subs:[
+    'Cluster Public Representative','Cluster Justice Officer','Cluster Marketing Officer 1','Cluster Marketing Officer 2','Cluster Marketing Officer 3','Receptionist'
+  ]},
+  { key:'shivshakti_miniCluster', label:'Shivshakti — MINI CLUSTER', subs:[
+    'Village Coordinator Leader','Village Security Coordinator 1','Village Security Coordinator 2','Village Security Coordinator 3','Village Security Coordinator 4','Receptionist'
+  ]},
+  { key:'shivshakti_groupLeader', label:'Shivshakti — GROUP LEADER', subs:[
+    'Adhyaksh (President)','Sachiv (Secretary)','Khajindar (Treasurer)'
+  ]},
+  { key:'shivshakti_worker', label:'Shivshakti — WORKER', subs:[
+    'Worker'
+  ]}
+];
+
+// Optional: Suggested role-levels per subcategory for the registration role dropdown (keeps UI helpful)
+const roleSuggestions = {
+  // a few generic suggestions — registration role dropdown can still accept any chosen from subcategory list above
+  'Chairman':['Chairman'],
+  'Vice Chairman':['Vice Chairman'],
+  'Managing Director':['Managing Director'],
+  'Executive Director':['Executive Director'],
+  'Operations and CEO':['Operations and CEO'],
+  'COO':['COO'],
+  'CFO':['CFO'],
+  'CHRO':['CHRO'],
+  'IT and Security Head':['IT and Security Head'],
+  'Reception Manager':['Reception Manager','Receptionist'],
+  'Office Boy/Girl':['Office Boy','Office Girl','Worker'],
+  'Worker':['Worker'],
+  'Central President':['Central President'],
+  'Vice President':['Vice President'],
+  'General Secretary':['General Secretary'],
+  'Adhyaksh (President)':['Adhyaksh (President)'],
+  'Sachiv (Secretary)':['Sachiv (Secretary)'],
+  'Khajindar (Treasurer)':['Khajindar (Treasurer)']
+};
+
+// ---------- helpers to populate selects ----------
+function initCategorySelects(){
+  const main = document.getElementById('mainCategory');
+  const staffMain = document.getElementById('staff_main');
+  const taskMain = document.getElementById('task_assign_main');
+  [main, staffMain, taskMain].forEach(s=>{
+    if(!s) return;
+    s.innerHTML = '';
+    mainCats.forEach(c=>{
+      const o = document.createElement('option'); o.value = c.key; o.text = c.label; s.add(o);
+    });
+  });
+  populateSubcat();
+  populateStaffFilters();
+  // also init registration category/subcategory selects
+  initRegCategorySelects();
+}
+function populateSubcat(){
+  const main = document.getElementById('mainCategory');
+  const sub = document.getElementById('subCategory');
+  if(!main || !sub) return;
+  const mainVal = main.value;
+  sub.innerHTML = '';
+  const cat = mainCats.find(c=>c.key===mainVal);
+  if(cat){
+    cat.subs.forEach(name=>{
+      const o = document.createElement('option'); o.value = name; o.text = name; sub.add(o);
+    });
+  }
+  updateTermsLink();
+}
+function updateTermsLink(){
+  const sub = document.getElementById('subCategory');
+  const link = document.getElementById('termsLink');
+  if(!sub || !link) return;
+  const sel = sub.options[sub.selectedIndex];
+  if(sel) {
+    link.href = '#';
+    link.textContent = 'Terms for ' + sel.value + ' (demo)';
+  } else {
+    link.href = '#'; link.textContent = 'No link';
+  }
+}
+
+/* ---------- Registration Category/Subcategory/Role helpers ---------- */
+function initRegCategorySelects(){
+  const regCat = document.getElementById('reg_category');
+  const regSub = document.getElementById('reg_subcategory');
+  if(!regCat || !regSub) return;
+  regCat.innerHTML = '';
+  const cats = ['gaarrkh','shivshakti'];
+  cats.forEach(c=>{
+    const o = document.createElement('option'); o.value = c; o.text = c.toUpperCase(); regCat.add(o);
+  });
+  updateRegCategoryFromOrg();
+  updateRegSubcats();
+}
+function updateRegCategoryFromOrg(){
+  const regCat = document.getElementById('reg_category');
+  const org = document.getElementById('orgSelect') ? document.getElementById('orgSelect').value : null;
+  if(regCat && org) regCat.value = org;
+  updateRegSubcats();
+}
+function updateRegSubcats(){
+  const regCat = document.getElementById('reg_category');
+  const regSub = document.getElementById('reg_subcategory');
+  const regRole = document.getElementById('reg_stafflevel');
+  if(!regCat || !regSub || !regRole) return;
+  regSub.innerHTML = '';
+  regRole.innerHTML = '';
+  const catKey = regCat.value;
+  const subs = (catKey === 'gaarrkh') ? // flatten all gaarrkh-related sub lists grouped by their high-level areas
+    [
+      'CENTRAL','STATE','DIVISIONAL','ZONE','CLUSTER','MINI CLUSTER','GROUP LEADER','WORKER'
+    ] : [
+      'CENTRAL','STATE','DIVISIONAL','ZONE','CLUSTER','MINI CLUSTER','GROUP LEADER','WORKER'
+    ];
+  // For registration we let the user pick the high-level sub-area (CENTRAL / STATE / DIVISIONAL / ZONE / CLUSTER / MINI CLUSTER / GROUP LEADER / WORKER)
+  // and then we'll map to the specific roles from mainCats entries when needed.
+  const blank = document.createElement('option'); blank.value=''; blank.text='-- select subcategory area --'; regSub.add(blank);
+  subs.forEach(s=>{
+    const o = document.createElement('option'); o.value = s; o.text = s; regSub.add(o);
+  });
+  const blankRole = document.createElement('option'); blankRole.value=''; blankRole.text='-- select role (optional) --'; regRole.add(blankRole);
+}
+function updateRegStaffLevels(){
+  const regCat = document.getElementById('reg_category');
+  const regSub = document.getElementById('reg_subcategory');
+  const regRole = document.getElementById('reg_stafflevel');
+  if(!regCat || !regSub || !regRole) return;
+  regRole.innerHTML = '';
+  const blankRole = document.createElement('option'); blankRole.value=''; blankRole.text='-- select role (optional) --'; regRole.add(blankRole);
+
+  const area = regSub.value; // e.g., 'CENTRAL' or 'STATE'
+  const cat = regCat.value;
+  if(!area) return;
+
+  // find matching mainCats entries for the chosen area and category
+  // map area to keys used in mainCats
+  let keysForArea = [];
+  if(area === 'CENTRAL'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_central'] : ['shivshakti_central'];
+  } else if(area === 'STATE'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_state'] : ['shivshakti_state'];
+  } else if(area === 'DIVISIONAL'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_divisional'] : ['shivshakti_divisional'];
+  } else if(area === 'ZONE'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_zone'] : ['shivshakti_zone'];
+  } else if(area === 'CLUSTER'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_cluster'] : ['shivshakti_cluster'];
+  } else if(area === 'MINI CLUSTER'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_miniCluster'] : ['shivshakti_miniCluster'];
+  } else if(area === 'GROUP LEADER'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_groupLeader'] : ['shivshakti_groupLeader'];
+  } else if(area === 'WORKER'){
+    keysForArea = (cat==='gaarrkh') ? ['gaarrkh_worker'] : ['shivshakti_worker'];
+  }
+
+  // aggregate roles
+  let roles = [];
+  keysForArea.forEach(k=>{
+    const entry = mainCats.find(mc => mc.key === k);
+    if(entry && entry.subs) roles = roles.concat(entry.subs);
+  });
+
+  // populate regRole with these roles
+  if(roles.length){
+    roles.forEach(r=>{
+      const o = document.createElement('option'); o.value = r; o.text = r; regRole.add(o);
+    });
+  } else {
+    // fallback suggestions from roleSuggestions
+    Object.keys(roleSuggestions).forEach(k=>{
+      const opts = roleSuggestions[k];
+      opts.forEach(oName=>{
+        const o = document.createElement('option'); o.value = oName; o.text = oName; regRole.add(o);
+      });
+    });
+  }
+}
+
+/* ---------- Staff filters populate (left pane) ---------- */
+function populateStaffFilters(){
+  const staffMain = document.getElementById('staff_main');
+  const staffSub = document.getElementById('staff_sub');
+  if(!staffMain || !staffSub) return;
+  staffMain.innerHTML = '';
+  mainCats.forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.text=c.label; staffMain.add(o); });
+  staffMain.addEventListener('change',()=>{
+    const cat = mainCats.find(cc=>cc.key===staffMain.value);
+    staffSub.innerHTML='';
+    if(cat) cat.subs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.text=s; staffSub.add(o); });
+    populateStaffDropdown();
+  });
+  staffMain.dispatchEvent(new Event('change'));
+}
+
+function populateStaffDropdown(){
+  const main = document.getElementById('staff_main');
+  const sub = document.getElementById('staff_sub');
+  const sel = document.getElementById('staff_list_dropdown');
+  if(!main || !sub || !sel) return;
+  const mainKey = main.value;
+  const subVal = sub.value;
+  sel.innerHTML = '';
+  const cat = mainCats.find(c=>c.key===mainKey);
+  if(!cat) return;
+  // if specific sub selected, highlight it; otherwise list all roles
+  const roles = cat.subs.slice();
+  roles.forEach(r=>{
+    const o = document.createElement('option');
+    o.value = r;
+    o.text = r;
+    sel.add(o);
+  });
+}
+
+/* ---------- Posts, Tasks, Calendar, Leave, Election (unchanged logic, safe with old data) ---------- */
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str).replace(/[&<>"'`]/g, function(s){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;',"`":'&#96;'}[s]; });
+}
+function clearPost(){ document.getElementById('post_text').value=''; document.getElementById('post_video').value=''; }
+function submitPost(){
+  const text = document.getElementById('post_text').value;
+  const videoFile = document.getElementById('post_video').files[0];
+  const posts = JSON.parse(localStorage.getItem('posts')||'[]');
+  const entry = {id:Date.now(), text, time:new Date().toISOString(), org: (window.currentUser && window.currentUser.org) || null};
+  if(videoFile){ entry.videoName = videoFile.name; }
+  posts.unshift(entry);
+  localStorage.setItem('posts', JSON.stringify(posts));
+  renderPosts();
+  clearPost();
+}
+function renderPosts(){
+  const feed = document.getElementById('posts_feed');
+  const posts = JSON.parse(localStorage.getItem('posts')||'[]');
+  if(!posts.length) { feed.innerHTML = '<div class="small">No posts yet</div>'; return; }
+  feed.innerHTML = posts.map(p=>`<div class="card-light" style="margin-bottom:8px"><div style="font-weight:700">${escapeHtml(p.text)||'(video)'}</div><div class="small" style="margin-top:6px">${new Date(p.time).toLocaleString()} ${p.videoName?('<div class="small">Video: '+escapeHtml(p.videoName)+'</div>'):''}</div></div>`).join('');
+}
+
+/* Tasks */
+function populateAssignTo(){
+  const main = document.getElementById('task_assign_main');
+  const subSelect = document.getElementById('task_assign_sub');
+  if(!main || !subSelect) return;
+  const cat = mainCats.find(c=>c.key===main.value);
+  subSelect.innerHTML='';
+  if(cat) cat.subs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.text=s; subSelect.add(o); });
+  subSelect.addEventListener('change', ()=>{
+    const staff = buildStaffForCat(main.value, subSelect.value);
+    const tgt = document.getElementById('task_assign_to'); if(!tgt) return; tgt.innerHTML='';
+    staff.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.text=s; tgt.add(o); });
+  });
+  subSelect.dispatchEvent(new Event('change'));
+}
+function buildStaffForCat(mainKey, subName){
+  const cat = mainCats.find(c=>c.key===mainKey);
+  if(!cat) return ['Worker'];
+  const list = [];
+  const idx = cat.subs.indexOf(subName);
+  if(idx>=0){
+    for(let i=idx;i<cat.subs.length;i++){
+      list.push(cat.subs[i] + ' - ' + (i===cat.subs.length-1 ? 'Worker' : 'Staff'));
+    }
+  } else {
+    cat.subs.forEach(s=>list.push(s));
+  }
+  list.push('worker_1'); list.push('worker_2');
+  return list;
+}
+function clearTaskForm(){ document.getElementById('task_title').value=''; document.getElementById('task_description').value=''; }
+function createTask(){
+  const title = document.getElementById('task_title').value;
+  const desc = document.getElementById('task_description').value;
+  const to = document.getElementById('task_assign_to').value;
+  const priority = document.getElementById('task_priority').value;
+  const deadline = document.getElementById('task_deadline').value;
+  if(!title || !to){ alert('Please add title and assignee'); return; }
+  const tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
+  const t = {id:Date.now(), title, desc, to, from:(window.currentUser && window.currentUser.username)||'admin', priority, deadline, status:'Pending', time:new Date().toISOString()};
+  tasks.push(t); localStorage.setItem('tasks', JSON.stringify(tasks));
+  alert('Task created and notification sent (demo).');
+  refreshMyTasks();
+}
+function refreshMyTasks(){
+  const list = JSON.parse(localStorage.getItem('tasks')||'[]');
+  const me = (window.currentUser && window.currentUser.username) || null;
+  const el = document.getElementById('mytasks_list');
+  const mine = list.filter(t=>t.to===me || t.to==='all' || (me && t.to.includes(me)));
+  if(!mine.length) { el.innerHTML = '<div class="small">No tasks assigned to you.</div>'; return; }
+  el.innerHTML = mine.map(t=>`<div class="card-light" style="margin-bottom:8px;padding:10px"><div style="display:flex;justify-content:space-between"><div><strong>${escapeHtml(t.title)}</strong><div class="small">${escapeHtml(t.desc)}</div></div><div><div class="small">Priority: ${escapeHtml(t.priority)}</div><div class="small">Status: <span id="status_${t.id}">${escapeHtml(t.status)}</span></div></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><select id="update_${t.id}"><option>Pending</option><option>Running</option><option>Complete</option></select><button class="btn" onclick="updateTaskStatus(${t.id})">Update</button></div></div>`).join('');
+}
+function updateTaskStatus(id){
+  const sel = document.getElementById('update_'+id);
+  const newStatus = sel.value;
+  const tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
+  const t = tasks.find(x=>x.id===id);
+  if(t){ t.status = newStatus; localStorage.setItem('tasks', JSON.stringify(tasks)); document.getElementById('status_'+id).textContent = newStatus; alert('Status updated and assigner notified (demo).'); }
+  refreshMyTasks();
+}
+
+/* Calendar */
+function createEvent(){
+  const title = document.getElementById('event_title').value;
+  const date = document.getElementById('event_date').value;
+  if(!title || !date) return alert('Add title and date');
+  const events = JSON.parse(localStorage.getItem('events')||'[]');
+  events.push({id:Date.now(), title, date, creator:(window.currentUser&&window.currentUser.username)||'admin'});
+  localStorage.setItem('events', JSON.stringify(events));
+  renderCalendar();
+  alert('Event created and will appear in all calendars (demo).');
+}
+function renderCalendar(){
+  const el = document.getElementById('calendar_view');
+  const events = JSON.parse(localStorage.getItem('events')||'[]');
+  if(!events.length){ el.innerHTML = '<div class="small">No events</div>'; return; }
+  const grouped = {};
+  events.forEach(e=>{ grouped[e.date] = grouped[e.date] || []; grouped[e.date].push(e); });
+  let out = '';
+  Object.keys(grouped).sort().forEach(d=>{ out += '<div class="card-light" style="margin-bottom:8px"><div style="font-weight:700">'+d+'</div>' + grouped[d].map(ev=>'<div class="event">'+escapeHtml(ev.title)+'</div>').join('') + '</div>'; });
+  el.innerHTML = out;
+}
+
+/* Leave / Election */
+function submitLeave(){
+  const type = document.getElementById('leave_type').value;
+  const from = document.getElementById('leave_from').value;
+  const details = document.getElementById('leave_details').value;
+  if(!details) return alert('Please add details');
+  const leaves = JSON.parse(localStorage.getItem('leaves')||'[]');
+  leaves.push({id:Date.now(), type, from, details, user:(window.currentUser&&window.currentUser.username)||'user', time:new Date().toISOString()});
+  localStorage.setItem('leaves', JSON.stringify(leaves));
+  alert('Submitted. Higher-level notified (demo).');
+}
+function setupElectionCandidates(){
+  const sel = document.getElementById('election_candidates');
+  sel.innerHTML = '';
+  const candidates = ['Adhyaksh (President)','Sachiv (Secretary)','Khajindar (Treasurer)'];
+  candidates.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; sel.add(o); });
+}
+function castVote(){
+  const c = document.getElementById('election_candidates').value;
+  if(!c) return alert('Select candidate');
+  const votes = JSON.parse(localStorage.getItem('votes')||'{}');
+  votes[c] = (votes[c]||0) + 1;
+  localStorage.setItem('votes', JSON.stringify(votes));
+  document.getElementById('election_status').textContent = 'Voted for '+c;
+}
+
+/* Settings, navigation, auth */
+function applySettings(){
+  const bg = document.getElementById('setting_hdr_bg').value;
+  const txt = document.getElementById('setting_hdr_text').value;
+  if(bg) document.getElementById('page-welcome').style.background = bg;
+  if(txt) document.getElementById('welcomeText').style.color = txt;
+  alert('Settings applied (demo).');
+}
+function showTab(tab) {
+  document.querySelectorAll('#tabContent .tab').forEach(t => t.style.display = 'none');
+  const el = document.getElementById(tab);
+  if(el) el.style.display = 'block';
+}
+function go(page){
+  document.querySelectorAll('[id^="page-"]').forEach(e=>e.style.display='none');
+  const el = document.getElementById('page-'+page);
+  if(el) el.style.display='block';
+  if(page==='dashboard') document.getElementById('page-dashboard').style.display='block';
+}
+function generateReadableId(org){
+  const prefix = (org && org.toUpperCase && org.toUpperCase()==='SHIVSHAKTI') ? 'SHIVSHAKTI' : 'GAARRKH';
+  const num = Math.floor(1000 + Math.random()*9000);
+  return `${prefix}-${num}`;
+}
+function registerUser(){
+  if(!document.getElementById('agreeTnc').checked){ alert('Please agree T&C'); return; }
+  const usernameInput = document.getElementById('reg_username').value;
+  const u = {
+    username: usernameInput || ('user_'+Date.now()),
+    name: document.getElementById('reg_name').value || 'User',
+    org: document.getElementById('orgSelect').value,
+    contact: document.getElementById('reg_contact').value,
+    alt: document.getElementById('reg_alt_contact').value,
+    state: document.getElementById('reg_state').value,
+    city: document.getElementById('reg_city').value,
+    service_city: document.getElementById('reg_service_city').value,
+    service_zip: document.getElementById('reg_service_zip').value,
+    adhar: document.getElementById('reg_adhar').value,
+    pan: document.getElementById('reg_pan').value,
+    mainCategory: document.getElementById('mainCategory') ? document.getElementById('mainCategory').value : '',
+    subCategory: document.getElementById('subCategory') ? document.getElementById('subCategory').value : '',
+    category: document.getElementById('reg_category').value || '',
+    subcategory: document.getElementById('reg_subcategory').value || '',
+    staffLevel: document.getElementById('reg_stafflevel').value || '',
+    id: 'ID-'+Math.random().toString(36).slice(2,8)
+  };
+  if(!u.readableId) u.readableId = generateReadableId(u.org);
+  const users = JSON.parse(localStorage.getItem('users')||'{}');
+  users[u.username] = users[u.username] ? Object.assign(users[u.username], u) : u;
+  localStorage.setItem('users', JSON.stringify(users));
+  alert('Registered (demo). Please login. Your ID: ' + u.readableId);
+  go('login');
+}
+function doLogin(){
+  const username = document.getElementById('login_username').value || 'demo.user';
+  const users = JSON.parse(localStorage.getItem('users')||'{}');
+  const u = users[username] || {username, name:username, org:'gaarrkh', mainCategory:'gaarrkh_central', subCategory:'Chairman'};
+  window.currentUser = u;
+  document.getElementById('userName').textContent = u.name;
+  document.getElementById('userId').textContent = 'ID: ' + (u.id||'') + (u.readableId ? (' • ' + u.readableId) : '');
+  document.getElementById('userRoleBadge').textContent = (u.subCategory || '');
+  document.getElementById('dashWelcome').textContent = 'Welcome to ' + ((u.org && u.org.toUpperCase && u.org.toUpperCase()==='SHIVSHAKTI') ? 'Shivshakti' : 'Gaarrkh');
+  document.getElementById('dashRole').textContent = (u.mainCategory || '') + ' / ' + (u.subCategory || '');
+  document.getElementById('userCategory').textContent = u.category ? ('Category: ' + u.category.toUpperCase()) : '';
+  document.getElementById('userSubcategory').textContent = u.subcategory ? ('Subcategory area: ' + u.subcategory) : '';
+  document.getElementById('userStaffLevel').textContent = u.staffLevel ? ('Role: ' + u.staffLevel) : '';
+  go('dashboard'); showTab('home'); renderPosts(); setupElectionCandidates(); initAfterLogin();
+}
+function initAfterLogin(){
+  initCategorySelects();
+  populateAssignTo();
+  renderCalendar();
+  refreshMyTasks();
+  const userMain = (window.currentUser && window.currentUser.mainCategory) || 'gaarrkh_central';
+  if(document.getElementById('staff_main')) {
+    document.getElementById('staff_main').value = userMain;
+    document.getElementById('staff_main').dispatchEvent(new Event('change'));
+  }
+}
+function logout(){ window.currentUser = null; go('login'); }
+
+/* initial */
+initCategorySelects();
+go('welcome');
+
+</script>
+</body>
+</html>
